@@ -1,0 +1,55 @@
+model User {
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  phone         String?
+  password      String
+  profileImage  String?
+
+  isVerified    Boolean  @default(false)
+  isPremium     Boolean  @default(false)
+  isBlocked     Boolean  @default(false)
+  isDeleted     Boolean  @default(false)
+
+  credits       Int      @default(0)
+  lastLogin     DateTime?
+  dob           DateTime?
+  profession    String?
+
+  role          Role     @default(USER)
+
+  otps          Otp[]   
+ 
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Otp {
+  id         String    @id @default(uuid())
+  userId     String
+  codeHash   String
+  type       OtpType
+  expiresAt  DateTime
+  used       Boolean   @default(false)
+  attempts   Int       @default(0)
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+enum OtpType {
+  RESET_PASSWORD
+  EMAIL_VERIFY
+  LOGIN
+}
+
+
+enum Role {
+    USER 
+    ADMIN
+    SUPER_ADMIN
+    
+}
